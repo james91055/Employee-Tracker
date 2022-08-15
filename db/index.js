@@ -1,4 +1,4 @@
-const connection = require("./connection");
+const connection = require("../lib/connection");
 
 class employeeDB {
   constructor(connection) {

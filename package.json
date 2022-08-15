@@ -2,7 +2,7 @@
   "name": "employee-tracker",
   "version": "1.0.0",
   "description": "A command-line application to manage a company's employee database, using Node.js, Inquirer, and MySQL.",
-  "main": "index.js",
+  "main": "server.js",
   "dependencies": {
     "console.table": "^0.10.0",
     "inquirer": "^7.3.3",
@@ -17,16 +17,16 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sylviaprabudy/employee-tracker.git"
+    "url": "git+https://github.com/james91055/Employee-Tracker.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/sylviaprabudy/employee-tracker/issues"
+    "url": "https://github.com/james91055/Employee-Tracker/issues"
   },
-  "homepage": "https://github.com/sylviaprabudy/employee-tracker#readme"
+  "homepage": "https://github.com/james91055/Employee-Tracker#readme"
 }
