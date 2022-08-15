@@ -206,6 +206,76 @@ async function getEmployeeQuestions() {
   });
 }
 
+// Display all employees and their roles. User can select the employee to change, then select a new role.
+async function getUpdateEmployeeQuestions() {
+  console.clear();
+  // show info to update employee role
+  const [mrows] = await db.getEmployeeRoleInfo();
+  const empIdsArr = mrows.map((emp) => emp.id);
+  const rolesIdArr = mrows.map((emp) => emp.role_id);
+  console.table(mrows);
+
+  inquirer.prompt(updateEmployeeRoleQuestions).then((answers) => {
+    const { empId, newRole } = answers;
+    const eId = parseInt(empId);
+    const nRole = parseInt(newRole);
+    // check if employee and new role exist
+    if (empIdsArr.includes(eId) && rolesIdArr.includes(nRole)) {
+      db.updateEmployeeRole(eId, nRole);
+      const empIndex = empIdsArr.indexOf(eId);
+      const rIndex = rolesIdArr.indexOf(nRole);
+      console.clear();
+      console.log(
+        `\n--${mrows[empIndex].employee_name}'s role has been changed to ${mrows[rIndex].role}--\n`
+      );
+      mainMenu();
+    } else {
+      console.clear();
+      console.log(
+        "\n-- Either the employee number or the role ID is incorrect.--\n"
+      );
+      mainMenu();
+    }
+  });
+}
+
+// Display employees, allow user to select an employee and change their manager. If the user wants to promote an emplyee and make them a manager, they would need to use the 'Update employee role' option.
+async function getUpdateEmployeeManagerQuestions() {
+  const [rows] = await db.getEmployeeManagerInfo();
+  const idArr = rows.map((emp) => emp.employee_id);
+  const manIdArr = rows.map((man) => man.manager_id);
+  console.table(rows);
+
+  inquirer.prompt(updateEmployeeManagerQuestions).then((answers) => {
+    const { empId, newManager } = answers;
+    const eId = parseInt(empId);
+    const mId = parseInt(newManager);
+    // check if employee exists
+    if (idArr.includes(eId)) {
+      // check if manager exists
+      if (manIdArr.includes(mId)) {
+        db.updateEmployeeManager(eId, mId);
+
+        console.clear();
+        console.log(`--\nChanged Employee's Manager!--\n`);
+        mainMenu();
+      } else {
+        console.clear();
+        console.error(
+          "\n-- The ID for the manager was not in the database.--\n"
+        );
+        mainMenu();
+      }
+    } else {
+      console.clear();
+      console.error(
+        "\n-- The ID you entered did not match any employees. --\n"
+      );
+      mainMenu();
+    }
+  });
+}
+
 // create and display the title art
 console.log(
   figlet.textSync("Employee\nTracker\n", {
