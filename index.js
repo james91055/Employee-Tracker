@@ -78,3 +78,16 @@ function mainMenu() {
     }
   });
 }
+
+// create and display the title art
+console.log(
+  figlet.textSync("Employee\nTracker\n", {
+    font: "Standard",
+    horizontalLayout: "default",
+    verticalLayout: "default",
+    width: 80,
+    whitespaceBreak: true,
+  })
+);
+// call main menu
+mainMenu();
