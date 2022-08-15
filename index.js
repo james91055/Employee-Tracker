@@ -276,6 +276,169 @@ async function getUpdateEmployeeManagerQuestions() {
   });
 }
 
+// Display all departments, allow the user to select a department to delete.
+async function getDeleteDeptQuestions() {
+  console.clear();
+  // display all departments
+  const [rows] = await db.getDepartments();
+  const deptIdArr = rows.map((rows) => rows.id);
+  console.table(rows);
+  // which department to delete?
+  inquirer.prompt(deleteDepartmentQuestions).then((answers) => {
+    const { dept } = answers;
+    const deptInt = parseInt(dept);
+    // check if department exists
+    if (deptIdArr.includes(deptInt)) {
+      db.deleteDepartment(deptInt);
+      console.clear();
+      console.log(`\n-- Department was successfully deleted! --\n`);
+      mainMenu();
+    } else {
+      console.clear();
+      console.log(`\n-- Department ID was not found --\n`);
+      mainMenu();
+    }
+  });
+}
+
+// Display roles, allow the user to delete any role.
+async function getDeleteRoleQuestions() {
+  // show roles
+  console.clear();
+  const [rows] = await db.getRoles();
+  const rolesArr = rows.map((role) => role.role_id);
+  console.table(rows);
+  // which role to delete?
+  inquirer.prompt(deleteRoleQuestions).then((answers) => {
+    const { role } = answers;
+    const roleInt = parseInt(role);
+    // check if role exists
+    if (rolesArr.includes(roleInt)) {
+      db.deleteRole(roleInt);
+      console.clear();
+      console.log(`\n-- Role was successfully deleted! --\n`);
+      mainMenu();
+    } else {
+      console.clear();
+      console.log(`\n-- Role ID was not found --\n`);
+      mainMenu();
+    }
+  });
+}
+
+// Display all employees, allow user to select an employee to delete.
+async function getDeleteEmpQuestions() {
+  console.clear();
+
+  const [rows] = await db.getEmployees();
+  const empArr = rows.map((emp) => emp.id);
+  console.table(rows);
+
+  inquirer.prompt(deleteEmpQuestions).then((answers) => {
+    const { emp } = answers;
+    const empInt = parseInt(emp);
+    // check if employee exists
+    if (empArr.includes(empInt)) {
+      db.deleteEmp(empInt);
+      console.clear();
+      console.log(`\n-- Employee was successfully deleted! --\n`);
+      mainMenu();
+    } else {
+      console.clear();
+      console.log(`\n-- Employee ID was not found --\n`);
+      mainMenu();
+    }
+  });
+}
+
+// Display all departmnet, allow user to select a department, then display all employees under that department.
+async function getEmpByDeptQuestion() {
+  const [rows] = await db.getDepartments();
+  const deptArr = rows.map((dept) => dept.id);
+  console.table(rows);
+  inquirer
+    .prompt(empByDeptQuestions)
+    .then(async (answer) => {
+      const { dept } = answer;
+      const deptInt = parseInt(dept);
+      // check if department exists
+      if (deptArr.includes(deptInt)) {
+        console.clear();
+        const [rows] = await db.getEmployeesByDepartment(deptInt);
+        console.table(rows);
+        mainMenu();
+      } else {
+        console.clear();
+        console.log(`\n-- Department ID was not found --\n`);
+        mainMenu();
+      }
+    })
+    .catch((err) => {
+      if (err) {
+        console.clear();
+        console.error(err);
+        mainMenu();
+      }
+    });
+}
+
+// Display all managers, allow user to select a manager to display all of their subordinance.
+async function getEmpByManagerQuestion() {
+  const [rows] = await db.getAllManagers();
+  const manIdArr = rows.map((man) => man.id);
+  console.table(rows);
+
+  inquirer.prompt(empByManagerQuestion).then(async (answer) => {
+    const { manager } = answer;
+    const managerInt = parseInt(manager);
+    // check if manager exists
+    if (manIdArr.includes(managerInt)) {
+      console.clear();
+      const [rows] = await db.getEmpsByManager(managerInt);
+      console.table(rows);
+      mainMenu();
+    } else {
+      console.clear();
+      console.log(`\n-- Manager ID was not found --\n`);
+      mainMenu();
+    }
+  });
+}
+
+// Display all departments and allow user to view the sum of all salaries within the department.
+async function getTotalUtilizedBudgetQuestion() {
+  console.clear();
+  const [rows] = await db.getDepartments();
+  console.table(rows);
+  // which department?
+  inquirer
+    .prompt(totalUtilizedBudgetQuestion)
+    .then(async (answer) => {
+      const { dept } = answer;
+      const [rows] = await db.getTotalUtilizedBudget(parseInt(dept));
+      const salariesArr = rows.map((salary) => parseInt(salary.salary));
+      const initialValue = 0;
+      const sumWithInitial = salariesArr.reduce(
+        (previousValue, currentValue) => previousValue + currentValue,
+        initialValue
+      );
+      let sumWithCommas = sumWithInitial.toLocaleString("en-US");
+      // will display $0 if the department does not exist.
+      console.log(
+        `\n -- The total budget utilized for this department is $${sumWithCommas} --\n`
+      );
+      mainMenu();
+    })
+    .catch((err) => {
+      if (err) {
+        console.error(err);
+      }
+    });
+}
+// exit the program
+function exit() {
+  process.exit();
+}
 // create and display the title art
 console.log(
   figlet.textSync("Employee\nTracker\n", {
