@@ -79,6 +79,32 @@ function mainMenu() {
   });
 }
 
+// display all departments in database
+async function viewDept() {
+    console.clear();
+    const [rows] = await db.getDepartments();
+    console.table(rows)
+    mainMenu()
+}
+
+// display all roles in database
+async function viewRoles() {
+    console.clear();
+    const [rows] = await db.getRoles();
+    console.table(rows);
+    mainMenu();
+}
+
+// display all employees in database
+async function viewEmployees(){
+    console.clear();
+    const [rows] = await db.getEmployees();
+    console.table(rows);
+    mainMenu();
+}
+
+
+
 // create and display the title art
 console.log(
   figlet.textSync("Employee\nTracker\n", {
